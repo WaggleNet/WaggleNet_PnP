@@ -80,7 +80,7 @@ uint8_t* Sensor::getRegister(uint8_t mar) {
         return (uint8_t*) &type;
     else if (mar == 2)
         return &size_;
-    else {
+    else if (mar>=4) {
         uint8_t k = (mar - 4) / 2;
         if (mar % 2 == 1)
             return &lengths_[k];
@@ -95,7 +95,7 @@ uint8_t Sensor::getRegisterSize(uint8_t mar) {
         return sizeof(type);
     else if (mar == 2)
         return 1;
-    else {
+    else if (mar>=4) {
         uint8_t k = (mar - 4) / 2;
         if (mar % 2 == 1)
             return 1;
