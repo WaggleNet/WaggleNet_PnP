@@ -27,6 +27,12 @@ class Sensor {
         uint8_t* getData(uint8_t index);
         uint8_t getSize();
         #define addEntry(DATA) addData((void*)&DATA, sizeof(DATA))
+        // Useful attributes
+        uint8_t address;
+        uint32_t type;
+        // Register Translation
+        uint8_t* getRegister(uint8_t mar);
+        uint8_t getRegisterSize(uint8_t mar);
     private:
         uint8_t size_;
         uint8_t max_size_;

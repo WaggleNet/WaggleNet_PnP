@@ -64,3 +64,42 @@ uint8_t* Sensor::getData (uint8_t index) {
 uint8_t Sensor::getSize () {
     return size_;
 }
+
+/**
+ * Translating from register number to data pointer
+ * ====REGISTER MAP====
+ * 0: Not connected
+ * 1: Sensor Type
+ * 2: Data Size
+ * 3: (Reserved)
+ * 4+2*k: Data in the k_th entry
+ * 4+2*k+1: Length of the k_th entry
+ */
+uint8_t* Sensor::getRegister(uint8_t mar) {
+    if (mar == 1)
+        return (uint8_t*) &type;
+    else if (mar == 2)
+        return &size_;
+    else {
+        uint8_t k = (mar - 4) / 2;
+        if (mar % 2 == 1)
+            return &lengths_[k];
+        else return (uint8_t*) data_[k];
+    }
+    // Undefined behavior for undefined registers
+    return &address;
+}
+
+uint8_t Sensor::getRegisterSize(uint8_t mar) {
+    if (mar == 1)
+        return sizeof(type);
+    else if (mar == 2)
+        return 1;
+    else {
+        uint8_t k = (mar - 4) / 2;
+        if (mar % 2 == 1)
+            return 1;
+        else return lengths_[k];
+    }
+    return 1;
+}
