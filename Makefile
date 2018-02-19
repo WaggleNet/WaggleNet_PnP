@@ -1,5 +1,5 @@
 EXENAME = test
-OBJS = sensor.o main.o
+OBJS = .objs/sensor.o .objs/main.o
 
 CXX = clang++
 CXXFLAGS = -std=c++11 -stdlib=libc++ -c -g -O0 -Wall -Wextra
@@ -8,14 +8,17 @@ LDFLAGS = -std=c++11
 
 all: $(EXENAME)
 
+.objs:
+	@mkdir -p .objs
+
 $(EXENAME): $(OBJS)
 	$(LD) $^ $(LDFLAGS) -o $@
 
-main.o: src/pc_test/main.cpp
-	$(CXX) $< $(CXXFLAGS)
+.objs/main.o: src/pc_test/main.cpp .objs
+	$(CXX) $< $(CXXFLAGS) -o $@
 
-sensor.o: src/sensor/sensor.cpp
-	$(CXX) $< $(CXXFLAGS)
+.objs/sensor.o: src/sensor/sensor.cpp .objs
+	$(CXX) $< $(CXXFLAGS) -o $@
 
 clean:
-	-rm -f *.o $(EXENAME)
+	-rm -rf *.o $(EXENAME) .objs
