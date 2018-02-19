@@ -1,26 +1,28 @@
-#include <Arduino.h>
-#include <loop.h>
-#include <Wire,h>
 
-struct channel{
-  uint8_t numebr;
-  uint8_t size
-  int *d
-  *d = & data ;
+
+class sensor{
+  uint32_t type;
+  uint8_t size;
+  uint8_t* lengths;
+  void** data;
+};
+
+sensor::sensor(size){
+  int lengths[3]={};
+  lengths = new uint8_t[size];
 }
 
+sensor::sensor(){
+  int data[3]={};
+  data = new float[0];
+  data = new float[1];
+  data = new int[2];
+}
 
-unit16_t x0
-unit16_t x1
-void print_data(x0,x1,sensor_id,internal_add1,internal_add2) {
-  Wire.beginTransmission(sensor_id);
-  Wire.write(internal_add1);
-  Wire.write(internal_add2);
-  Wire.endTransmission();
-  Wire.requestForm(sensor_id,2);
-
-  if(Wire.available(),<=2) {
-    x0 = Wire.read();
-    x2 = Wire.read();
-  }//put your main code here, to run repeatedly:
+void loop_data(){
+  for (int i=0, i<=8,i++){
+    uint8_t* data = uint8_t* data + i;
+    uint8_t* = & data_get
+    data[i] = data_get
+  }
 }
