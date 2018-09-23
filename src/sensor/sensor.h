@@ -40,6 +40,7 @@ class Sensor {
         // Register Translation
         uint8_t* getRegister(uint8_t mar);
         uint8_t getRegisterSize(uint8_t mar);
+        bool setRegister(uint8_t mar, uint8_t* data);
     protected:
         uint8_t size_;
         uint8_t max_size_;

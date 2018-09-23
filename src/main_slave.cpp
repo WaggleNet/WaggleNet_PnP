@@ -1,12 +1,15 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include "sensor/sensor.h"
+#include "sensor/pnpsensor.h"
+
+PnPSensor sensor;
 
 void setup() {
   Serial.begin(9600);
-  Wire.begin();// put your setup code here, to run once:
+  sensor.begin(0x67);
+  StartSensor(sensor);
 }
 
 void loop() {
-  
+  sensor.update();
 }

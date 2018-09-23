@@ -145,6 +145,7 @@ uint8_t* Sensor::getRegister(uint8_t mar) {
 }
 
 uint8_t Sensor::getRegisterSize(uint8_t mar) {
+    if (mar >= 192) return 1; // syscall variable
     if (mar == 1)
         return sizeof(type);
     else if (mar == 2)
@@ -156,4 +157,16 @@ uint8_t Sensor::getRegisterSize(uint8_t mar) {
         else return lengths_[k];
     }
     return 1;
+}
+
+bool Sensor::setRegister(uint8_t mar, uint8_t* data) {
+    // First off, if the MAR is not writable at all, ignore it
+    if (mar % 4) return false;
+    // Now find out how long the data is
+    uint8_t idx = mar / 4 - 1;
+    uint8_t len = lengths_[idx];
+    for (uint8_t i = 0; i < len; i++) {
+        ((uint8_t*)data_[idx])[i] = data[i];
+    }
+    return true;
 }
