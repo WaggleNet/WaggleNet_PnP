@@ -33,8 +33,9 @@ void PnPSensor::begin(uint8_t addr = 0x35) {
 
 bool PnPSensor::update() {
     // Just collect data
-    if ((long)millis() - 1000l*interval_ - last_collect_ >= 0) {
+    if ((long)millis() - last_collect_ >= 1000L * interval_) {
         collectAll();
+        last_collect_ = millis();
         return true;
     }
     return false;
@@ -47,6 +48,7 @@ void PnPSensor::onReceive(int size) {
     // If just waiting for MAR, set buffer
     if (!await_mar) {
         mar_ = WIRE.read();
+        await_mar = 1;
         Serial.print("Rx --> MAR = ");
         Serial.println((int)mar_);
         // If there's still data, call back with MDR setting
@@ -69,6 +71,7 @@ void PnPSensor::onReceive(int size) {
                 setRegister(mar_, buffer);
             } else {
                 // Handle Syscall
+                Serial.println("Rx --> Syscall");
                 auto ch = WIRE.read();
                 handleSyscall_(mar_, ch);
             }
@@ -91,9 +94,12 @@ void PnPSensor::onRequest () {
         WIRE.write(handleSyscall_(mar_));
     } else {
         auto data = getRegister(mar_);
+        Serial.print("Tx --> Data readout: 0x");
         for (byte i = 0; i < size; i++) {
             WIRE.write(data[i]);
+            Serial.print(data[i], HEX);
         }
+        Serial.println();
         // If there's autoclear, now clear the flag
         if (autoclear_ && (!mar_ % 4)) changed(mar_ / 4 - 1, 0);
     }
@@ -102,9 +108,12 @@ void PnPSensor::onRequest () {
 }
 
 void PnPSensor::collect(byte index) {
-    if (collectors_[index] != NULL)
+    if (collectors_[index] != NULL) {
+        Serial.print("> Collecting data from ");
+        Serial.println(index, DEC);
         collectors_[index]();
-    last_collect_ = millis();
+        changed(index);
+    }
 }
 
 void PnPSensor::collectAll() {
