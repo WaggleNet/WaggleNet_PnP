@@ -23,8 +23,8 @@ void test_simple_dut() {
     cout << "Byte length (expected " << sizeof(uint8_t) << "): " << (unsigned)dut.getLength(byte_index) << endl;
     cout << "----REGISTER MAP----" << endl;
     cout << "MAR\tSIZE\tMDR" << endl;
-    for (int i = 0; i <= 9; i++) {
-        cout << i << '\t' << (int)dut.getRegisterSize(i) << '\t';
+    for (int i = 0; i < 4*4; i++) {
+        cout << dec << i << '\t' << (int)dut.getRegisterSize(i) << '\t';
         auto mdr = dut.getRegister(i);
         for (int j = dut.getRegisterSize(i)-1; j>=0; j--) {
             cout << "0x" << hex << (int)mdr[j] << " ";
