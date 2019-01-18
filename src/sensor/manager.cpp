@@ -183,3 +183,15 @@ bool SensorManager::collect(uint8_t index) {
     }
     return true;
 }
+
+Sensor* SensorManager::getSensor(uint8_t index) {
+    if (index >= count_) return nullptr;
+    return sensors_[index];
+}
+
+uint8_t SensorManager::getIndexByAddress(uint8_t address) {
+    for (uint8_t i = 0; i < count_; i++) {
+        if (sensors_[i]->address == address) return i;
+    }
+    return count_;
+}
