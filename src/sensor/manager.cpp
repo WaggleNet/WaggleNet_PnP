@@ -13,28 +13,27 @@ void SensorManager::updateSensors() {
     uint8_t* scanResults;
     wireScan(0x60, 0x70, scanResults);
     delete[] scanResults;
-    Serial.println("> Adding 0x67 to sensors");
-    image_sensor(0x67);
+    Serial.println("> Adding 0x62 to sensors");
+    image_sensor(0x62);
 }
 
 uint8_t SensorManager::wireScan(uint8_t lower, uint8_t upper, uint8_t*& results) {
     results = new uint8_t[32];
     uint8_t error;
     uint8_t counter = 0;
-    Serial.println("> Scanning sensors over I2C");
+    Serial.println(F("-!>\tSTART\tSCANNING"));
     for (uint8_t addr=lower; addr < upper; addr++) {
         Wire.beginTransmission(addr);
         error = Wire.endTransmission(true);
         if (!error) {
             results[counter] = addr;
             counter ++;
-            Serial.print("--> Found device at 0x");
+            Serial.print(F("-->\tSensor.Address\t"));
             Serial.println(addr, HEX);
         }
     }
-    Serial.print("--> Done, found ");
-    Serial.print((int)counter);
-    Serial.println(" devices.");
+    Serial.print("-!>\tOK\tFOUND\t");
+    Serial.println((int)counter);
     return counter;
 }
 
@@ -53,9 +52,9 @@ uint8_t SensorManager::image_sensor(uint8_t addr) {
     // TODO: Bail
     res = i2c_read_reg(addr, 2, &length);
     // TODO: Bail
-    Serial.print("--> Sensor version: ");
+    Serial.print(F("-->\tSensor.Version\t"));
     Serial.println(version, HEX);
-    Serial.print("--> Number of entries: ");
+    Serial.print(F("-->\tSensor.Size\t"));
     Serial.println(length, HEX);
     if (!version || !length) {
         fail_msg = "Invalid sensor profile";
@@ -75,18 +74,19 @@ uint8_t SensorManager::image_sensor(uint8_t addr) {
             goto bail;
         }
         sensor->addData(new uint8_t[size], size);
-        Serial.print("--> Adding data entry ");
-        Serial.print(i, DEC);
-        Serial.print(", length ");
+        Serial.print(F("-->\tEntry.Index\t"));
+        Serial.println(i, DEC);
+        Serial.print(F("-->\tEntry.Length\t"));
         Serial.println(size, DEC);
     }
     // Success
     result = addSensor(sensor);
-    Serial.print("--> Imaging successful, index: ");
+    Serial.print(F("-->\tSensor.Index\t"));
     Serial.println(result);
+    Serial.println("-!>\tOK");
     return result;
     bail:
-        Serial.print("-!> ");
+        Serial.print("-!>\tERR\t");
         Serial.println(fail_msg);
         if (sensor == NULL) delete sensor;
         return 255;
@@ -124,7 +124,7 @@ bool SensorManager::i2c_read_reg(uint8_t addr, uint8_t mar, uint8_t* data, uint8
     Wire.endTransmission(false);
     auto l = Wire.requestFrom(addr, length);
     if (l != length) return false;
-    Serial.print("--> Data readout: 0x");
+    // Serial.print("--> Data readout: 0x");
     for (uint8_t i = 0; i < length; i++) {
         data[i] = Wire.read();
         Serial.print(data[i], HEX);
@@ -144,32 +144,33 @@ bool SensorManager::i2c_write_reg(uint8_t addr, uint8_t mar, uint8_t* data, uint
 
 void SensorManager::dumpToSerial(uint8_t index) {
     auto& s = *(sensors_[index]);
-    Serial.println("> Sensor dump:");
-    Serial.print("-- Address: 0x");
+    Serial.println(F("-!>\tSTART\tDump.Sensor"));
+    Serial.print(F("-->\tSensor.Address\t0x"));
     Serial.println(s.address, HEX);
-    Serial.print("-- Type: 0x");
+    Serial.print(F("-->\tSensor.Type\t0x"));
     Serial.println(s.type, HEX);
-    Serial.print("-- Number of Entries: ");
+    Serial.print(F("-->\tSensor.Size\t"));
     Serial.println(s.getSize(), DEC);
-    Serial.println("-- DATA ENTRIES --");
+    Serial.println(F("-!>\tSTART\tDump.Data"));
     for (byte i = 0; i < s.getSize(); i++) {
         auto data = (uint8_t*)s.getData(i);
         auto len = s.getLength(i);
-        Serial.print("---- Entry #");
-        Serial.print(i, DEC);
-        Serial.print(" [");
-        Serial.print(len, DEC);
-        Serial.print("]: 0x");
+        Serial.print(F("-->\tEntry.Index\t"));
+        Serial.println(i, DEC);
+        Serial.print(F("-->\tEntry.Length\t"));
+        Serial.println(len, DEC);
+        Serial.print(F("-->\tEntry.Data\t"));
         for (byte j = 0; j < len; j++) {
             Serial.print(data[j], HEX);
             Serial.print(' ');
         }
         Serial.println();
     }
+    Serial.println(F("-!>\tOK"));
 }
 
 bool SensorManager::collect(uint8_t index) {
-    Serial.print("> Collecting data from #");
+    Serial.print(F("-!>\tSTART\tCollect.Sensor\t"));
     Serial.println(index, DEC);
     auto& s = *(sensors_[index]);
     auto addr = s.address;
@@ -177,8 +178,20 @@ bool SensorManager::collect(uint8_t index) {
         auto len = s.getLength(i);
         auto data = (uint8_t*) s.getData(i);
         i2c_read_reg(addr, 4+4*i, data, len);
-        Serial.print("--> Setting data entry ");
-        Serial.println(i, DEC);
+        // Serial.print("--> Setting data entry ");
+        // Serial.println(i, DEC);
     }
     return true;
+}
+
+Sensor* SensorManager::getSensor(uint8_t index) {
+    if (index >= count_) return nullptr;
+    return sensors_[index];
+}
+
+uint8_t SensorManager::getIndexByAddress(uint8_t address) {
+    for (uint8_t i = 0; i < count_; i++) {
+        if (sensors_[i]->address == address) return i;
+    }
+    return count_;
 }

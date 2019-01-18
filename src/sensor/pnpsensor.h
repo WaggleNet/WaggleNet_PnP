@@ -6,12 +6,13 @@
  * - Additions of syscall handler
  */
 #include <Arduino.h>
-#include <Wire.h>
 #include "../sensor/sensor.h"
 
 #ifdef UNO
+#include <Wire.h>
 #define WIRE Wire
 #else
+#include <Wire1.h>
 #define WIRE Wire1
 #endif
 
