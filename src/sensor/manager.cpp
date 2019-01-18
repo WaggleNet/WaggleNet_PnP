@@ -13,8 +13,8 @@ void SensorManager::updateSensors() {
     uint8_t* scanResults;
     wireScan(0x60, 0x70, scanResults);
     delete[] scanResults;
-    Serial.println("> Adding 0x67 to sensors");
-    image_sensor(0x67);
+    Serial.println("> Adding 0x62 to sensors");
+    image_sensor(0x62);
 }
 
 uint8_t SensorManager::wireScan(uint8_t lower, uint8_t upper, uint8_t*& results) {
