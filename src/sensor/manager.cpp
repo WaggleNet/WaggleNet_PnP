@@ -124,7 +124,7 @@ bool SensorManager::i2c_read_reg(uint8_t addr, uint8_t mar, uint8_t* data, uint8
     Wire.endTransmission(false);
     auto l = Wire.requestFrom(addr, length);
     if (l != length) return false;
-    // Serial.print("--> Data readout: 0x");
+    Serial.print("--> Data readout: 0x");
     for (uint8_t i = 0; i < length; i++) {
         data[i] = Wire.read();
         Serial.print(data[i], HEX);
