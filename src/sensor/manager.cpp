@@ -170,16 +170,27 @@ void SensorManager::dumpToSerial(uint8_t index) {
 }
 
 bool SensorManager::collect(uint8_t index) {
+    uint8_t changed;
     Serial.print(F("-!>\tSTART\tCollect.Sensor\t"));
     Serial.println(index, DEC);
     auto& s = *(sensors_[index]);
     auto addr = s.address;
     for (byte i = 0; i < s.getSize(); i++) {
-        auto len = s.getLength(i);
-        auto data = (uint8_t*) s.getData(i);
-        i2c_read_reg(addr, 4+4*i, data, len);
+        // First determine if the sensor is changed
+        i2c_read_reg(addr, 4+4*i+1, &changed, 1);
+        if (changed) {
+            Serial.print(F("-->\tEntry.Changed\t"));
+            Serial.println(i);
+            auto len = s.getLength(i);
+            auto data = (uint8_t*) s.getData(i);
+            i2c_read_reg(addr, 4+4*i, data, len);
+            // Set local copy as changed as well
+            s.changed(i);
+        }
         // Serial.print("--> Setting data entry ");
         // Serial.println(i, DEC);
+        // Clear all changed flags via SysCall 193
+        i2c_write_reg(addr, 193, &changed, 1);
     }
     return true;
 }
