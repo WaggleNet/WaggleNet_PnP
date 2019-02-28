@@ -17,7 +17,7 @@ $(EXENAME): $(OBJS)
 .objs/main.o: src/pc_test/main.cpp .objs
 	$(CXX) $< $(CXXFLAGS) -o $@
 
-.objs/sensor.o: src/sensor/sensor.cpp .objs
+.objs/sensor.o: lib/sensor/sensor.cpp .objs
 	$(CXX) $< $(CXXFLAGS) -o $@
 
 clean:

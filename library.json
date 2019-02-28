@@ -1,0 +1,25 @@
+{
+    "name": "WaggleNet Smart Sensor",
+    "keywords": "sensor, i2c, generic, wagglenet",
+    "description": "Generic Smart Sensor protocol based on I2C",
+    "authors":
+    {
+        "name": "WaggleNet @ University of Illinois",
+        "url": "https://wagglenet.org/",
+        "email": "wagglenet.uiuc@gmail.com"
+    },
+    "version": "0.1",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/WaggleNet/WaggleNet_PnP.git"
+    },
+    "export": {
+        "include": [
+            "lib/sensor/*"
+        ]
+    },
+    "frameworks": "arduino",
+    "license": "NCSA",
+    "platforms": "*"
+}

@@ -1,11 +1,11 @@
 #include <Arduino.h>
-#include "sensor/sensor.h"
-#include "sensor/manager.h"
+#include "sensor.h"
+#include "pnpmanager.h"
 
 SensorManager manager;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   manager.begin();
 }
 

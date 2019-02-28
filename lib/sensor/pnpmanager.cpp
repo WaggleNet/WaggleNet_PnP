@@ -1,4 +1,4 @@
-#include "manager.h"
+#include "pnpmanager.h"
 
 SensorManager::SensorManager() {
 
