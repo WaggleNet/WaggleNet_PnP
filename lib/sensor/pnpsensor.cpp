@@ -42,26 +42,34 @@ bool PnPSensor::update() {
 }
 
 void PnPSensor::onReceive(int size) {
+    #ifdef DEBUG
     if (!size) {
         Serial.println("Rx -!> No data");
     }
+    #endif
     // If just waiting for MAR, set buffer
     if (!await_mar) {
         mar_ = WIRE.read();
         await_mar = 1;
+        #ifdef DEBUG
         Serial.print("Rx --> MAR = ");
         Serial.println((int)mar_);
+        #endif
         // If there's still data, call back with MDR setting
         if (size-1) onReceive(size-1);
     } else { 
         // First check the size
         auto expected_length = getRegisterSize(mar_);
         if (size != expected_length) {
+            #ifdef DEBUG
             Serial.println("Rx -!> Size mismatch");
+            #endif
             while (WIRE.available()) WIRE.read();
         } else {
             if (mar_ < 192) {
+                #ifdef DEBUG
                 Serial.println("Rx --> Set MDR");
+                #endif
                 byte buffer[expected_length];
                 byte counter = 0;
                 while (WIRE.available()) {
@@ -71,7 +79,9 @@ void PnPSensor::onReceive(int size) {
                 setRegister(mar_, buffer);
             } else {
                 // Handle Syscall
+                #ifdef DEBUG
                 Serial.println("Rx --> Syscall");
+                #endif
                 auto ch = WIRE.read();
                 handleSyscall_(mar_, ch);
             }
@@ -82,24 +92,36 @@ void PnPSensor::onReceive(int size) {
 }
 
 void PnPSensor::onRequest () {
+    #ifdef DEBUG
     Serial.println("Tx --> Req");
+    #endif
     // First off, if I don't know what to send, send nothing
     if (!await_mar) return;
     // Now send the things
     auto size = getRegisterSize(mar_);
+    #ifdef DEBUG
     Serial.print("Tx --> Data of size ");
+    #endif
+    #ifdef DEBUG
     Serial.println(size);
+    #endif
     // Handle syscall
     if (mar_ >= 192) {
         WIRE.write(handleSyscall_(mar_));
     } else {
         auto data = getRegister(mar_);
+        #ifdef DEBUG
         Serial.print("Tx --> Data readout: 0x");
+        #endif
         for (byte i = 0; i < size; i++) {
             WIRE.write(data[i]);
+            #ifdef DEBUG
             Serial.print(data[i], HEX);
+            #endif
         }
+        #ifdef DEBUG
         Serial.println();
+        #endif
         // If there's autoclear, now clear the flag
         if (autoclear_ && (!mar_ % 4)) changed(mar_ / 4 - 1, 0);
     }
@@ -109,8 +131,10 @@ void PnPSensor::onRequest () {
 
 void PnPSensor::collect(byte index) {
     if (collectors_[index] != NULL) {
+        #ifdef DEBUG
         Serial.print("> Collecting data from ");
         Serial.println(index, DEC);
+        #endif
         collectors_[index]();
         changed(index);
     }

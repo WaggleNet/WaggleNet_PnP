@@ -10,15 +10,17 @@ void SensorManager::begin() {
 }
 
 void SensorManager::updateSensors() {
-    uint8_t* scanResults;
-    wireScan(0x60, 0x70, scanResults);
-    delete[] scanResults;
-    Serial.println("> Adding 0x62 to sensors");
-    image_sensor(0x62);
+    uint8_t scanResults[16];
+    int num_found = wireScan(0x60, 0x70, scanResults);
+    for (int i = 0; i < num_found; i++) {
+        Serial.print(F("-!>\tSTART\tIMAGING\t0x"));
+        Serial.println(scanResults[i], HEX);
+        image_sensor(scanResults[i]);
+    }
+    
 }
 
-uint8_t SensorManager::wireScan(uint8_t lower, uint8_t upper, uint8_t*& results) {
-    results = new uint8_t[32];
+uint8_t SensorManager::wireScan(uint8_t lower, uint8_t upper, uint8_t* results) {
     uint8_t error;
     uint8_t counter = 0;
     Serial.println(F("-!>\tSTART\tSCANNING"));
@@ -204,5 +206,9 @@ uint8_t SensorManager::getIndexByAddress(uint8_t address) {
     for (uint8_t i = 0; i < count_; i++) {
         if (sensors_[i]->address == address) return i;
     }
+    return count_;
+}
+
+uint8_t SensorManager::getSensorCount() {
     return count_;
 }
