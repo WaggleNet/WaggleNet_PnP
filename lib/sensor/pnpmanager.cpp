@@ -141,6 +141,7 @@ bool SensorManager::i2c_write_reg(uint8_t addr, uint8_t mar, uint8_t* data, uint
     Wire.endTransmission(false);
     Wire.beginTransmission(addr);
     auto res = Wire.write(data, length);
+    Wire.endTransmission();
     return res;
 }
 
@@ -191,9 +192,9 @@ bool SensorManager::collect(uint8_t index) {
         }
         // Serial.print("--> Setting data entry ");
         // Serial.println(i, DEC);
-        // Clear all changed flags via SysCall 193
-        i2c_write_reg(addr, 193, &changed, 1);
     }
+    // Clear all changed flags via SysCall 193
+    auto res = i2c_write_reg(addr, 193, &changed, 1);
     return true;
 }
 
