@@ -11,7 +11,7 @@ void SensorManager::begin() {
 
 void SensorManager::updateSensors() {
     uint8_t scanResults[16];
-    int num_found = wireScan(0x60, 0x70, scanResults);
+    int num_found = wireScan(ADDR_BEGIN, ADDR_BEGIN + 0x10, scanResults);
     for (int i = 0; i < num_found; i++) {
         Serial.print(F("-!>\tSTART\tIMAGING\t0x"));
         Serial.println(scanResults[i], HEX);

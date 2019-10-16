@@ -22,7 +22,7 @@ uint8_t PnPSensor::addData(void* location, uint8_t length) {
     return size_ - 1;
 }
 
-void PnPSensor::begin(uint8_t addr = 0x35) {
+void PnPSensor::begin(uint8_t addr = 0x20) {
     // Set up I2C
     WIRE.begin(addr);
     // Initialize state machine

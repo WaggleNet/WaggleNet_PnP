@@ -17,6 +17,7 @@
 #endif
 
 #define VERSION 1
+#define ADDR_BEGIN 0x20  // I2C address starts at 0x20
 
 class Sensor {
     public:
