@@ -18,6 +18,16 @@
 
 typedef void (*FuncPtr)();
 
+/**
+ * For WaggleNet Smart Sensor modules, reads the addresses from PIN3-6.
+ */
+uint8_t readAddress() {
+  DDRD &= 0b10000111; // Clear PD6-3 to read address
+  PORTD |= 0b01111000; // Set them to pullup
+  delay(10);
+  return ((PIND >> 3) & 0xf) + 0x20; // Take PD6-3 readouts
+}
+
 #define StartSensor(SENSOR) \
     WIRE.onReceive([](int howMany){SENSOR.onReceive(howMany);}); \
     WIRE.onRequest([](){SENSOR.onRequest();});
