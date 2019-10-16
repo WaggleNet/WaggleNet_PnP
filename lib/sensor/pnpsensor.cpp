@@ -1,5 +1,12 @@
 #include "pnpsensor.h"
 
+uint8_t readAddress() {
+  DDRD &= 0b10000111; // Clear PD6-3 to read address
+  PORTD |= 0b01111000; // Set them to pullup
+  delay(10);
+  return ((PIND >> 3) & 0xf) + ADDR_BEGIN; // Take PD6-3 readouts
+}
+
 PnPSensor::PnPSensor():Sensor() {
     
 }
