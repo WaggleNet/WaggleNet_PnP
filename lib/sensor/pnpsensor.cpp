@@ -1,11 +1,13 @@
 #include "pnpsensor.h"
 
+#ifdef __AVR_ARCH__
 uint8_t readAddress() {
   DDRD &= 0b10000111; // Clear PD6-3 to read address
   PORTD |= 0b01111000; // Set them to pullup
   delay(10);
   return ((PIND >> 3) & 0xf) + ADDR_BEGIN; // Take PD6-3 readouts
 }
+#endif
 
 PnPSensor::PnPSensor():Sensor() {
     
@@ -175,7 +177,9 @@ void PnPSensor::handleSyscall_(uint8_t vector, uint8_t arg) {
             break;
         case 200:
             // Force restart
+            #ifdef __AVR_ARCH__
             asm volatile ("  jmp 0");
+            #endif
             break;
         default:
             return;
