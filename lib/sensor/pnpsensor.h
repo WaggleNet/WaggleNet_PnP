@@ -46,7 +46,7 @@ class PnPSensor: public Sensor {
         void changeSize(uint8_t new_max_size);
         void handleSyscall_(uint8_t vector, uint8_t arg);
         uint8_t handleSyscall_(uint8_t vector);
-        bool autoclear_ = true;
+        bool autoclear_ = false;
         uint8_t interval_ = 5;
         uint32_t last_collect_ = 0;
         FuncPtr* collectors_;
