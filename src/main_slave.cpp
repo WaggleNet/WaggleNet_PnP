@@ -24,7 +24,7 @@ void setup() {
   sensor.addAutoEntry(currTime, getCurrTime);
   sensor.addEntry(constant);
   Serial.println("Sensor has started");
-  sensor.begin(0x62);
+  sensor.begin(0x28);
   StartSensor(sensor);
 }
 
