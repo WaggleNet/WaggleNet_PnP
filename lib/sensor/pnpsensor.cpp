@@ -13,19 +13,20 @@ PnPSensor::PnPSensor():Sensor() {
     
 }
 
-uint8_t PnPSensor::addData(void* location, uint8_t length, FuncPtr handler) {
-    uint8_t index = PnPSensor::addData(location, length);
+uint8_t PnPSensor::addData(void* location, uint8_t length, uint8_t cflags, FuncPtr handler) {
+    uint8_t index = PnPSensor::addData(location, length, cflags);
     collectors_[index] = handler;
     return index;
 }
 
-uint8_t PnPSensor::addData(void* location, uint8_t length) {
+uint8_t PnPSensor::addData(void* location, uint8_t length, uint8_t cflags) {
     // First check if the data array has ever been initialized.
     if (size_ == max_size_) changeSize(max_size_ + 1);
     // Insert data at last location
     data_[size_] = location;
     lengths_[size_] = length;
-    changed_[size_] = 0;
+    vflags_[size_] = 0;
+    cflags_[size_] = cflags;
     // Increment size
     size_ ++;
     return size_ - 1;
