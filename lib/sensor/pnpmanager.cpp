@@ -46,7 +46,7 @@ uint8_t SensorManager::wireScan(uint8_t lower, uint8_t upper, uint8_t* results) 
  */
 uint8_t SensorManager::image_sensor(uint8_t addr) {
     // Prelim: Read version of sensor, make sure it's acceptable
-    uint8_t version, length, result, size;
+    uint8_t version, length, result, size, cflags;
     String fail_msg;
     bool res;
     Sensor* sensor = NULL;
@@ -75,7 +75,13 @@ uint8_t SensorManager::image_sensor(uint8_t addr) {
             fail_msg += (int)i;
             goto bail;
         }
-        sensor->addData(new uint8_t[size], size);
+        res = i2c_read_reg(addr, 4+4*i+3, &cflags);
+        if (!res){
+            fail_msg = "Error when reading register ";
+            fail_msg += (int)i;
+            goto bail;
+        }
+        sensor->addData(new uint8_t[size], size, cflags);
         Serial.print(F("-->\tEntry.Index\t"));
         Serial.println(i, DEC);
         Serial.print(F("-->\tEntry.Length\t"));
