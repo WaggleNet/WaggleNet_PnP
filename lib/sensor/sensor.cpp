@@ -19,10 +19,12 @@ void Sensor::changeSize (uint8_t new_max_size) {
     void** new_data_ = new void*[new_max_size];
     uint8_t* new_lengths_ = new uint8_t[new_max_size];
     uint8_t* new_vflags_ = new uint8_t[new_max_size];
+    uint8_t* new_cflags_ = new uint8_t[new_max_size];
     for (uint8_t i = 0; i < new_max_size; i++) {
         new_data_[i] = NULL;
         new_lengths_[i] = 0;
         new_vflags_[i] = 0;
+        new_cflags_[i] = 0;
     }
     // If there was old data, migrate the data
     if (max_size_ > 0) {
@@ -30,16 +32,19 @@ void Sensor::changeSize (uint8_t new_max_size) {
             new_data_[i] = data_[i];
             new_lengths_[i] = lengths_[i];
             new_vflags_[i] = vflags_[i];
+            new_cflags_[i] = cflags_[i];
         }
         delete[] data_;
         delete[] lengths_;
         delete[] vflags_;
+        delete[] cflags_;
     }
     // Commit transition
     max_size_ = new_max_size;
     data_ = new_data_;
     lengths_ = new_lengths_;
     vflags_ = new_vflags_;
+    cflags_ = new_cflags_;
 }
 
 /**

@@ -1,9 +1,9 @@
 EXENAME = test
 OBJS = .objs/sensor.o .objs/main.o
 
-CXX = clang++
-CXXFLAGS = -std=c++11 -stdlib=libc++ -c -g -O0 -Wall -Wextra
-LD = clang++
+CXX = g++
+CXXFLAGS = -std=c++11 -c -g -O0 -Wall -Wextra
+LD = g++
 LDFLAGS = -std=c++11
 
 all: $(EXENAME)

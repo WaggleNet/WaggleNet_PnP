@@ -14,9 +14,9 @@ void test_simple_dut() {
 
     Sensor dut;
     dut.type = 125;
-    uint8_t int_index = dut.addEntry(test_int);
-    uint8_t float_index = dut.addEntry(test_double);
-    uint8_t byte_index = dut.addEntry(test_byte);
+    uint8_t int_index = dut.addIntEntry(test_int);
+    uint8_t float_index = dut.addFloatEntry(test_double);
+    uint8_t byte_index = dut.addUintEntry(test_byte);
     cout << "Current size (expected 3): " << (unsigned)dut.getSize() << endl;
     cout << "Int length (expected " << sizeof(int) << "): " << (unsigned)dut.getLength(int_index) << endl;
     cout << "Float length (expected " << sizeof(double) << "): " << (unsigned)dut.getLength(float_index) << endl;
