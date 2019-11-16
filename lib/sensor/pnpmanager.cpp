@@ -1,5 +1,10 @@
 #include "pnpmanager.h"
 
+typedef union {
+    unsigned int i;
+    float f;
+} u;
+
 SensorManager::SensorManager() {
 
 }
@@ -143,6 +148,50 @@ bool SensorManager::i2c_write_reg(uint8_t addr, uint8_t mar, uint8_t* data, uint
     auto res = Wire.write(data, length);
     Wire.endTransmission();
     return res;
+}
+
+void SensorManager::interpretData(uint8_t index) {
+    auto& s = *(sensors_[index]);
+    Serial.println(F("-!>\tSTART\tDump.Sensor"));
+    Serial.print(F("-->\tSensor.Address\t0x"));
+    Serial.println(s.address, HEX);
+    Serial.print(F("-->\tSensor.Type\t0x"));
+    Serial.println(s.type, HEX);
+    Serial.print(F("-->\tSensor.Size\t"));
+    Serial.println(s.getSize(), DEC);
+    Serial.println(F("-!>\tSTART\tDump.Data"));
+    // Loop through each data entry in the sensor
+    for (byte i = 0; i < s.getSize(); i++) {
+        auto data = (uint8_t*)s.getData(i);
+        auto len = s.getLength(i);
+        Serial.print(F("-->\tEntry.Index\t"));
+        Serial.println(i, DEC);
+        Serial.print(F("-->\tEntry.Length\t"));
+        Serial.println(len, DEC);
+
+        // Print data as float
+        u data_float;
+        unsigned int temp_data;
+        // intitalize value
+        data_float.i = 0;
+        Serial.print(F("-->\tEntry.Data\t"));
+        // Remember little endian
+        for (int j = 3; j >= 0; j--) {
+            // Serial.print(data[j],HEX);
+            // Serial.println();
+            data_float.i = data_float.i << 8;
+            data_float.i = data_float.i | (data[j] & 0xFF);
+
+        }
+        // Print float
+        // data_float = 0xFFFFFFFF & temp_data;
+        //Serial.print(data_float, HEX);
+        // float test = 1.234;
+        Serial.println();
+        Serial.print(data_float.f, 3);
+        Serial.println();
+    }
+    Serial.println(F("-!>\tOK"));
 }
 
 void SensorManager::dumpToSerial(uint8_t index) {

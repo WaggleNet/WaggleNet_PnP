@@ -14,6 +14,7 @@ class SensorManager {
     Sensor* getSensor(uint8_t index);
     uint8_t getIndexByAddress(uint8_t address);
     void dumpToSerial(uint8_t index);
+    void interpretData(uint8_t index);
     void updateSensors();
     uint8_t getSensorCount();
     // Data collection
