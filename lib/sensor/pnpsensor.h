@@ -27,13 +27,19 @@ uint8_t readAddress();
     WIRE.onReceive([](int howMany){SENSOR.onReceive(howMany);}); \
     WIRE.onRequest([](){SENSOR.onRequest();});
 
-#define addAutoEntry(DATA, HANDLER) addData((void*)&DATA, sizeof(DATA), HANDLER);
+#define addAutoEntry(DATA, HANDLER, CFLAGS) addData((void*)&DATA, sizeof(DATA), CFLAGS, HANDLER);
+#define addAutoIntEntry(DATA, HANDLER) addData((void*)&DATA, sizeof(DATA), DATA_TYPE_INT, HANDLER);
+#define addAutoUintEntry(DATA, HANDLER) addData((void*)&DATA, sizeof(DATA), DATA_TYPE_UINT, HANDLER);
+#define addAutoBoolEntry(DATA, HANDLER) addData((void*)&DATA, sizeof(DATA), DATA_TYPE_BOOL, HANDLER);
+#define addAutoFloatEntry(DATA, HANDLER) addData((void*)&DATA, sizeof(DATA), DATA_TYPE_FLOAT, HANDLER);
+#define addAutoStringntry(DATA, HANDLER) addData((void*)&DATA, sizeof(DATA), DATA_TYPE_STRING, HANDLER);
+#define addAutoBinaryEntry(DATA, HANDLER) addData((void*)&DATA, sizeof(DATA), DATA_TYPE_BINARY, HANDLER);
 
 class PnPSensor: public Sensor {
     public:
         PnPSensor();
-        uint8_t addData(void* location, uint8_t length, FuncPtr handler);
-        uint8_t addData(void* location, uint8_t length);
+        uint8_t addData(void* location, uint8_t length, uint8_t cflags, FuncPtr handler);
+        uint8_t addData(void* location, uint8_t length, uint8_t cflags);
         void begin(uint8_t addr);
         bool update();
         void onReceive(int size);

@@ -6,7 +6,8 @@ Sensor::Sensor (uint8_t max_size):size_(0), max_size_(0) {
     if (max_size == 0) {
         data_ = NULL;
         lengths_ = NULL;
-        changed_ = NULL;
+        vflags_ = NULL;
+        cflags_ = NULL;
     } else {
         changeSize(max_size_);
     }
@@ -17,28 +18,33 @@ void Sensor::changeSize (uint8_t new_max_size) {
     // First just add new arrays
     void** new_data_ = new void*[new_max_size];
     uint8_t* new_lengths_ = new uint8_t[new_max_size];
-    uint8_t* new_changed_ = new uint8_t[new_max_size];
+    uint8_t* new_vflags_ = new uint8_t[new_max_size];
+    uint8_t* new_cflags_ = new uint8_t[new_max_size];
     for (uint8_t i = 0; i < new_max_size; i++) {
         new_data_[i] = NULL;
         new_lengths_[i] = 0;
-        new_changed_[i] = 0;
+        new_vflags_[i] = 0;
+        new_cflags_[i] = 0;
     }
     // If there was old data, migrate the data
     if (max_size_ > 0) {
         for (uint8_t i = 0; i < (max_size_ < new_max_size ? max_size_ : new_max_size); i++) {
             new_data_[i] = data_[i];
             new_lengths_[i] = lengths_[i];
-            new_changed_[i] = changed_[i];
+            new_vflags_[i] = vflags_[i];
+            new_cflags_[i] = cflags_[i];
         }
         delete[] data_;
         delete[] lengths_;
-        delete[] changed_;
+        delete[] vflags_;
+        delete[] cflags_;
     }
     // Commit transition
     max_size_ = new_max_size;
     data_ = new_data_;
     lengths_ = new_lengths_;
-    changed_ = new_changed_;
+    vflags_ = new_vflags_;
+    cflags_ = new_cflags_;
 }
 
 /**
@@ -47,13 +53,14 @@ void Sensor::changeSize (uint8_t new_max_size) {
  * @param length: size of the variable.
  * @return: Index to the data.
  */
-uint8_t Sensor::addData (void* location, uint8_t length) {
+uint8_t Sensor::addData (void* location, uint8_t length, uint8_t cflags) {
     // First check if the data array has ever been initialized.
     if (size_ == max_size_) changeSize(max_size_ + 1);
     // Insert data at last location
     data_[size_] = location;
     lengths_[size_] = length;
-    changed_[size_] = 0;
+    vflags_[size_] = 0;
+    cflags_[size_] = cflags;
     // Incement size
     size_ ++;
     return size_ - 1;
@@ -83,14 +90,18 @@ void* Sensor::getData (uint8_t index) {
 
 uint8_t Sensor::hasChanged (uint8_t index) {
     if (index > size_) return 0;
-    return changed_[index];
+    return vflags_[index] & (1 << VFLAG_CHANGED_LOC);
 }
 
 /**
  * Set whether the data has changed / not changed
  */
 void Sensor::changed(uint8_t index, uint8_t changed) {
-    changed_[index] = changed;
+    if (!changed) {
+        vflags_[index] &= ~(1 << changed);
+    } else {
+        vflags_[index] |= 1 << changed;
+    }
 }
 
 /**
@@ -115,9 +126,9 @@ uint8_t Sensor::getSize () {
  * 2: Data Size
  * 3: (Reserved)
  * 4+4*k: Data in the k_th entry
- * 4+4*k+1: Whether there's new data (changed)
+ * 4+4*k+1: Variable Flags
  * 4+4*k+2: Length of the k_th entry
- * 4+4*k+3: <reserved>
+ * 4+4*k+3: Constant Flags
  * 200~255: Reserved Commands
  */
 uint8_t* Sensor::getRegister(uint8_t mar) {
@@ -130,13 +141,13 @@ uint8_t* Sensor::getRegister(uint8_t mar) {
     else if (mar>=4) {
         uint8_t k = (mar - 4) / 4;
         if (mar % 4 == 1)
-            // Asking for whether data changed
-            return &changed_[k];
+            // Asking for variable flags
+            return &vflags_[k];
         else if (mar % 4 == 2)
             // Asking for data length
             return &lengths_[k];
         else if (mar % 4 == 3)
-            // Reserved entry
+            // Asking for constant flags
             return &lengths_[k];
         else return (uint8_t*) data_[k];
     }
@@ -152,7 +163,7 @@ uint8_t Sensor::getRegisterSize(uint8_t mar) {
         return 1;
     else if (mar>=4) {
         uint8_t k = (mar - 4) / 4;
-        if (mar % 4 >= 1) // Requesting for size / changed / reserved
+        if (mar % 4 >= 1) // Requesting for size / vflag / cflag
             return 1;
         else return lengths_[k];
     }

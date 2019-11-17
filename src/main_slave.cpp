@@ -20,11 +20,11 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Sensor is setting up");
   sensor.type = 0x1234L;
-  sensor.addAutoEntry(analogReading, getAnalogReading);
-  sensor.addAutoEntry(currTime, getCurrTime);
-  sensor.addEntry(constant);
+  sensor.addAutoIntEntry(analogReading, getAnalogReading);
+  sensor.addAutoUintEntry(currTime, getCurrTime);
+  sensor.addFloatEntry(constant);
   Serial.println("Sensor has started");
-  sensor.begin(0x62);
+  sensor.begin(0x28);
   StartSensor(sensor);
 }
 
