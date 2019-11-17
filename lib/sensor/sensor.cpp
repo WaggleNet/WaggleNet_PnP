@@ -118,6 +118,21 @@ uint8_t Sensor::getSize () {
     return size_;
 }
 
+uint8_t Sensor::getCflag(uint8_t index) {
+    if (index > size_) return 0;
+    return cflags_[index];
+}
+
+uint8_t Sensor::getVflag(uint8_t index) {
+    if (index > size_) return 0;
+    return vflags_[index];
+}
+
+uint8_t Sensor::getDataType(uint8_t index) {
+    if (index > size_) return 0;
+    return getCflag(index) & CFLAG_TYPE_MASK;
+}
+
 /**
  * Translating from register number to data pointer
  * ====REGISTER MAP====
