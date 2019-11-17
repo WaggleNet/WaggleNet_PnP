@@ -31,6 +31,9 @@ class Sensor {
         void* getData(uint8_t index);
         uint8_t hasChanged(uint8_t index);
         uint8_t getSize();
+        uint8_t getDataType(uint8_t index);
+        uint8_t getCflag(uint8_t index);
+        uint8_t getVflag(uint8_t index);
         void changed(uint8_t index);
         void changed(uint8_t index, uint8_t changed);
         void clearChanged();
