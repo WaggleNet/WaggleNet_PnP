@@ -184,7 +184,7 @@ bool SensorManager::collect(uint8_t index) {
     auto addr = s.address;
     // If the address is 0, the sensor is local
     // and cannot be collected by I2C
-    if (!addr) return;
+    if (!addr) return false;
     Serial.print(F("-!>\tSTART\tCollect.Sensor\t"));
     Serial.println(index, DEC);
     for (byte i = 0; i < s.getSize(); i++) {
