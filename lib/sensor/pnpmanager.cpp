@@ -180,10 +180,13 @@ void SensorManager::dumpToSerial(uint8_t index) {
 
 bool SensorManager::collect(uint8_t index) {
     uint8_t changed;
-    Serial.print(F("-!>\tSTART\tCollect.Sensor\t"));
-    Serial.println(index, DEC);
     auto& s = *(sensors_[index]);
     auto addr = s.address;
+    // If the address is 0, the sensor is local
+    // and cannot be collected by I2C
+    if (!addr) return;
+    Serial.print(F("-!>\tSTART\tCollect.Sensor\t"));
+    Serial.println(index, DEC);
     for (byte i = 0; i < s.getSize(); i++) {
         // First determine if the sensor is changed
         i2c_read_reg(addr, 4+4*i+1, &changed, 1);
