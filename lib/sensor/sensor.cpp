@@ -98,9 +98,9 @@ uint8_t Sensor::hasChanged (uint8_t index) {
  */
 void Sensor::changed(uint8_t index, uint8_t changed) {
     if (!changed) {
-        vflags_[index] &= ~(1 << changed);
+        vflags_[index] &= ~(1 << VFLAG_CHANGED_LOC);
     } else {
-        vflags_[index] |= 1 << changed;
+        vflags_[index] |= 1 << VFLAG_CHANGED_LOC;
     }
 }
 
