@@ -94,10 +94,16 @@ void* Sensor::getData (uint8_t index) {
  * return: whether a callback function exists and is run
  */
 uint8_t Sensor::fireCallback(uint8_t index) {
+    if (index > size_) return 0;
     if (!change_callbacks_[index]) return 0;
     // Now run the func
     change_callbacks_[index](index);
     return 1;
+}
+
+void Sensor::setCallback(uint8_t index, ChangeCallbackFuncPtr fn) {
+    if (index > size_) return;
+    change_callbacks_[index] = fn;
 }
 
 /**

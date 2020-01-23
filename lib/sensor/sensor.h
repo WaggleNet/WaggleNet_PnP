@@ -39,6 +39,7 @@ class Sensor {
         uint8_t getCflag(uint8_t index);
         uint8_t getVflag(uint8_t index);
         uint8_t fireCallback(uint8_t index);
+        void setCallback(uint8_t index, ChangeCallbackFuncPtr fn);
         void changed(uint8_t index);
         void changed(uint8_t index, uint8_t changed);
         void clearChanged();
