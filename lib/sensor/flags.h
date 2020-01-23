@@ -5,6 +5,8 @@
 #define CFLAG_SIGNED_LOC    0
 #define CFLAG_REAL_LOC      1
 #define CFLAG_STR_LOC       2
+// Field is writable
+#define CFLAG_RW_LOC        6
 // Variable length
 #define CFLAG_VAR_LOC       7
 

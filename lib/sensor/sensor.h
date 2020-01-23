@@ -20,6 +20,10 @@
 #define VERSION 1
 #define ADDR_BEGIN 0x20  // I2C address starts at 0x20
 
+// Callback from change in sensor data value
+// Should take a parameter for index of changed field
+typedef void (*ChangeCallbackFuncPtr)(uint8_t);
+
 class Sensor {
     public:
         // Constructor
@@ -34,6 +38,7 @@ class Sensor {
         uint8_t getDataType(uint8_t index);
         uint8_t getCflag(uint8_t index);
         uint8_t getVflag(uint8_t index);
+        uint8_t fireCallback(uint8_t index);
         void changed(uint8_t index);
         void changed(uint8_t index, uint8_t changed);
         void clearChanged();
@@ -59,5 +64,6 @@ class Sensor {
         uint8_t* lengths_;
         uint8_t* cflags_;
         uint8_t* vflags_;
+        ChangeCallbackFuncPtr* change_callbacks_;
         void changeSize(uint8_t new_max_size);
 };
