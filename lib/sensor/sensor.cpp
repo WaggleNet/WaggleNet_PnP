@@ -20,11 +20,13 @@ void Sensor::changeSize (uint8_t new_max_size) {
     uint8_t* new_lengths_ = new uint8_t[new_max_size];
     uint8_t* new_vflags_ = new uint8_t[new_max_size];
     uint8_t* new_cflags_ = new uint8_t[new_max_size];
+    ChangeCallbackFuncPtr* new_callbacks_ = new ChangeCallbackFuncPtr[new_max_size];
     for (uint8_t i = 0; i < new_max_size; i++) {
         new_data_[i] = NULL;
         new_lengths_[i] = 0;
         new_vflags_[i] = 0;
         new_cflags_[i] = 0;
+        new_callbacks_[i] = 0;
     }
     // If there was old data, migrate the data
     if (max_size_ > 0) {
@@ -33,11 +35,13 @@ void Sensor::changeSize (uint8_t new_max_size) {
             new_lengths_[i] = lengths_[i];
             new_vflags_[i] = vflags_[i];
             new_cflags_[i] = cflags_[i];
+            new_callbacks_[i] = change_callbacks_[i];
         }
         delete[] data_;
         delete[] lengths_;
         delete[] vflags_;
         delete[] cflags_;
+        delete[] change_callbacks_;
     }
     // Commit transition
     max_size_ = new_max_size;
@@ -45,6 +49,7 @@ void Sensor::changeSize (uint8_t new_max_size) {
     lengths_ = new_lengths_;
     vflags_ = new_vflags_;
     cflags_ = new_cflags_;
+    change_callbacks_ = new_callbacks_;
 }
 
 /**
@@ -85,6 +90,23 @@ void* Sensor::getData (uint8_t index) {
 }
 
 /**
+ * Run callback function if any exists.
+ * return: whether a callback function exists and is run
+ */
+uint8_t Sensor::fireCallback(uint8_t index) {
+    if (index > size_) return 0;
+    if (!change_callbacks_[index]) return 0;
+    // Now run the func
+    change_callbacks_[index](index);
+    return 1;
+}
+
+void Sensor::setCallback(uint8_t index, ChangeCallbackFuncPtr fn) {
+    if (index > size_) return;
+    change_callbacks_[index] = fn;
+}
+
+/**
  * Retrieves whether the data has changed over the last fetch
  */
 
@@ -101,6 +123,7 @@ void Sensor::changed(uint8_t index, uint8_t changed) {
         vflags_[index] &= ~(1 << VFLAG_CHANGED_LOC);
     } else {
         vflags_[index] |= 1 << VFLAG_CHANGED_LOC;
+        fireCallback(index);
     }
 }
 
@@ -187,12 +210,20 @@ uint8_t Sensor::getRegisterSize(uint8_t mar) {
 
 bool Sensor::setRegister(uint8_t mar, uint8_t* data) {
     // First off, if the MAR is not writable at all, ignore it
-    if (mar % 4) return false;
+    if (mar % 4 > 1) return false;  // Length, cflags
+    if (mar < 4) return false;  // Metadata
     // Now find out how long the data is
     uint8_t idx = mar / 4 - 1;
     uint8_t len = lengths_[idx];
     for (uint8_t i = 0; i < len; i++) {
+        // Copy the data in
         ((uint8_t*)data_[idx])[i] = data[i];
+    }
+    // If setting data, implicitly set the changed flag
+    if (mar % 4 == 0) {
+        vflags_[idx] |= 1 << VFLAG_CHANGED_LOC;
+        // Also fire the changed callback
+        fireCallback(idx);
     }
     return true;
 }
