@@ -1,5 +1,5 @@
 {
-    "name": "WaggleNet Smart Sensor",
+    "name": "WaggleNet_Smart_Sensor",
     "keywords": "sensor, i2c, generic, wagglenet",
     "description": "Generic Smart Sensor protocol based on I2C",
     "authors":
