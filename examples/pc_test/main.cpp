@@ -3,7 +3,7 @@
 #endif
 
 #include <iostream>
-#include "../../lib/sensor/sensor.h"
+#include "sensor.h"
 
 using namespace std;
 
