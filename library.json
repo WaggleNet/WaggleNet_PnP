@@ -14,7 +14,6 @@
         "type": "git",
         "url": "https://github.com/WaggleNet/WaggleNet_PnP.git"
     },
-    "srcDir": "/lib/sensor",
     "frameworks": "arduino",
     "license": "NCSA",
     "platforms": "*"

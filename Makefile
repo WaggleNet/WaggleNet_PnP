@@ -14,10 +14,10 @@ all: $(EXENAME)
 $(EXENAME): $(OBJS)
 	$(LD) $^ $(LDFLAGS) -o $@
 
-.objs/main.o: src/pc_test/main.cpp .objs
+.objs/main.o: examples/pc_test/main.cpp .objs
 	$(CXX) $< $(CXXFLAGS) -o $@
 
-.objs/sensor.o: lib/sensor/sensor.cpp .objs
+.objs/sensor.o: src/sensor.cpp .objs
 	$(CXX) $< $(CXXFLAGS) -o $@
 
 clean:

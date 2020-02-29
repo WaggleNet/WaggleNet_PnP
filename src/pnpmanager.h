@@ -1,5 +1,5 @@
 #pragma once
-#include "../sensor/sensor.h"
+#include "sensor.h"
 #include <Arduino.h>
 #include "Wire.h"
 
